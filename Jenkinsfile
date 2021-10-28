@@ -24,7 +24,7 @@ pipeline {
                     }
                 }
             }
-         stage('Create a Bucket') {
+         stage('Create S3 bucket for backend') {
              when {
                     equals expected: true, actual: params.s3Bucket
             }
