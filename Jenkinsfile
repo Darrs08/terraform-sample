@@ -28,7 +28,14 @@ pipeline {
                     }
                 }
             }
-
+         stage('Create a Bucket and KeyPair') {
+             steps {
+                 withAWS(region: "us-east-1", credentials: 'cloud_user') {
+                     awsIdentity()
+                     sh 'aws s3api create-bucket --bucket demodars2 --region us-east-1'
+        }
+      }
+    }
         stage('Plan') {
             when {
                 not {
