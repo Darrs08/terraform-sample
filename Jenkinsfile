@@ -5,18 +5,14 @@ pipeline {
     }
     parameters {
         string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
+        booleanParam(name: 's3Bucket', defaultValue: false, description: 'Create s3 bucket for backend?')
         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
         booleanParam(name: 'destroy', defaultValue: false, description: 'Destroy Terraform build?')
-
     }
-
-
-     environment {
+    environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
-
-
     stages {
         stage('checkout') {
             steps {
@@ -29,6 +25,11 @@ pipeline {
                 }
             }
          stage('Create a Bucket and KeyPair') {
+             when {
+                not {
+                    equals expected: true, actual: params.s3Bucket
+                }
+            }
              steps {
                  withAWS(region: "us-east-1", credentials: 'cloud_user') {
                      awsIdentity()
@@ -60,10 +61,6 @@ pipeline {
                     equals expected: true, actual: params.destroy
                 }
            }
-           
-                
-            
-
            steps {
                script {
                     def plan = readFile 'tfplan.txt'
