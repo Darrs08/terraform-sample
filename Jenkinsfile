@@ -87,6 +87,7 @@ pipeline {
         
         steps {
            sh "terraform destroy --auto-approve"
+           sh "aws s3 rb s3://demodars2 --force" 
         }
     }
 
