@@ -24,9 +24,9 @@ pipeline {
                     }
                 }
             }
-         stage('Create a Bucket and KeyPair') {
+         stage('Create a Bucket') {
              when {
-                    equals expected: true, actual: params.s3Bucket
+                    equals expected: false, actual: params.s3Bucket
             }
              steps {
                  withAWS(region: "us-east-1", credentials: 'cloud_user') {
