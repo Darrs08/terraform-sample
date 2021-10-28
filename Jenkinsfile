@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    tools {
+        terraform 'terraform1.0.9'
+    }
     parameters {
         string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
@@ -21,7 +23,7 @@ pipeline {
                  script{
                         dir("terraform")
                         {
-                            git "https://github.com/troy-ingram/week-24-project.git"
+                            git "https://github.com/Darrs08/terraform-sample.git"
                         }
                     }
                 }
