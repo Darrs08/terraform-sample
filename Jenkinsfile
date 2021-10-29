@@ -85,7 +85,6 @@ pipeline {
          }           
          steps {
             sh "terraform output --json > Terraform_Output.json"
-            sh "terraform output --yaml > Terraform_Output.yaml"
          }
       }             
       stage('Destroy') {
