@@ -12,6 +12,7 @@ pipeline {
    environment {
       AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
       AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+      bucketName = 'demodars08'
    }
    stages {
       stage('checkout') {
@@ -30,7 +31,7 @@ pipeline {
          steps {
             withAWS(region: "us-east-1", credentials: 'cloud_user') {
             awsIdentity()
-            sh 'aws s3api create-bucket --bucket demodars2 --region us-east-1'
+            sh "aws s3api create-bucket --bucket ${bucketName} --region us-east-1"
             }
          }
       }
@@ -41,7 +42,7 @@ pipeline {
             }
          }   
          steps {
-            sh 'terraform init -input=false'
+            sh 'terraform init -migrate-state -input=false -backend-config="bucket=${bucketName}"'
             sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
             sh "terraform plan -input=false -out tfplan "
             sh 'terraform show -no-color tfplan > tfplan.txt'
@@ -80,7 +81,7 @@ pipeline {
          }        
          steps {
             sh "terraform destroy --auto-approve"
-            sh "aws s3 rb s3://demodars2 --force" 
+            sh "aws s3 rb s3://${bucketName} --force" 
          }
       }
    }
