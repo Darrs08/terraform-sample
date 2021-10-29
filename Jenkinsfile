@@ -16,9 +16,7 @@ pipeline {
       stage('checkout') {
          steps {
             script{  
-               dir(params.environment) {
-                  git "https://github.com/Darrs08/terraform-sample.git"
-               }
+               checkout()
             }
          }
       }
@@ -27,10 +25,7 @@ pipeline {
             equals expected: true, actual: params.s3Bucket
          }
          steps {
-            withAWS(region: "${awsRegion}", credentials: "${userCred}") {
-            awsIdentity()
-            sh "aws s3api create-bucket --bucket ${bucketName} --region us-east-1"
-            }
+            createBackendBucket()
          }
       }
       stage('Plan') {
@@ -40,10 +35,7 @@ pipeline {
             }
          }   
          steps {
-            sh 'terraform init -migrate-state -input=false -backend-config="bucket=${bucketName}"'
-            sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
-            sh "terraform plan -input=false -out tfplan"
-            sh "terraform show -no-color tfplan > tfplan.txt"
+            terraformPlan()
          }
       }
       stage('Approval') {
@@ -57,9 +49,7 @@ pipeline {
          }
          steps {
             script {
-               def plan = readFile 'tfplan.txt'
-               input message: "Do you want to apply the plan?",
-               parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+               terraformApproval()
             }
          }
       }
