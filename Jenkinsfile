@@ -46,8 +46,8 @@ pipeline {
          steps {
             sh 'terraform init -migrate-state -input=false -backend-config="bucket=${bucketName}"'
             sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
-            sh "terraform plan -input=false -out tfplan "
-            sh 'terraform show -no-color tfplan > tfplan.txt'
+            sh "terraform plan -input=false -out tfplan"
+            sh "terraform show -no-color tfplan > tfplan.txt"
          }
       }
       stage('Approval') {
@@ -85,7 +85,6 @@ pipeline {
          }           
          steps {
             sh "terraform output --json > Terraform_Output.json"
-            sh "terraform output --yaml > Terraform_Output.yaml"
          }
       }             
       stage('Destroy') {
