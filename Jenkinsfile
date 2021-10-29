@@ -13,6 +13,8 @@ pipeline {
       AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
       AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
       bucketName = 'demodars08'
+      awsRegion = 'us-east-1'
+      userCred = 'cloud_user'
    }
    stages {
       stage('checkout') {
@@ -29,7 +31,7 @@ pipeline {
             equals expected: true, actual: params.s3Bucket
          }
          steps {
-            withAWS(region: "us-east-1", credentials: 'cloud_user') {
+            withAWS(region: "${awsRegion}", credentials: "${userCred}") {
             awsIdentity()
             sh "aws s3api create-bucket --bucket ${bucketName} --region us-east-1"
             }
@@ -74,7 +76,18 @@ pipeline {
          steps {
             sh "terraform apply -input=false tfplan"
          }
-      }       
+      }
+      stage('Output') {
+         when {
+            not {
+               equals expected: true, actual: params.destroy
+            }
+         }           
+         steps {
+            sh "terraform output --json > Terraform_Output.json"
+            sh "terraform output --yaml > Terraform_Output.yaml"
+         }
+      }             
       stage('Destroy') {
          when {
             equals expected: true, actual: params.destroy
