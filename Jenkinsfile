@@ -45,7 +45,7 @@ pipeline {
          }   
          steps {
             sh 'cd ${environment} && terraform init -migrate-state -input=false -backend-config="bucket=${bucketName}"'
-            sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
+            sh 'cd ${environment} && terraform workspace select ${environment} || terraform workspace new ${environment}'
             sh "cd ${environment} && terraform plan -input=false -out tfplan"
             sh "cd ${environment} && terraform show -no-color tfplan > tfplan.txt"
          }
