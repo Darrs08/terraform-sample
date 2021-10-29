@@ -44,10 +44,10 @@ pipeline {
             }
          }   
          steps {
-            sh 'terraform init -migrate-state -input=false -backend-config="bucket=${bucketName}"'
+            sh "cd ${environment} && terraform init -migrate-state -input=false -backend-config="bucket=${bucketName}""
             sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
-            sh "terraform plan -input=false -out tfplan "
-            sh 'terraform show -no-color tfplan > tfplan.txt'
+            sh "cd ${environment} && terraform plan -input=false -out tfplan "
+            sh "cd ${environment} && terraform show -no-color tfplan > tfplan.txt"
          }
       }
       stage('Approval') {
@@ -74,7 +74,7 @@ pipeline {
             }
          }           
          steps {
-            sh "terraform apply -input=false tfplan"
+            sh "cd ${environment} && terraform apply -input=false tfplan"
          }
       }
       stage('Output') {
@@ -92,7 +92,7 @@ pipeline {
             equals expected: true, actual: params.destroy
          }        
          steps {
-            sh "terraform destroy --auto-approve"
+            sh "cd ${environment} && terraform destroy --auto-approve"
             sh "aws s3 rb s3://${bucketName} --force" 
          }
       }
