@@ -84,7 +84,7 @@ pipeline {
             }
          }           
          steps {
-            sh "terraform output --json > Terraform_Output.json"
+            sh "cd ${environment} && terraform output --json > Terraform_Output.json"
          }
       }             
       stage('Destroy') {
