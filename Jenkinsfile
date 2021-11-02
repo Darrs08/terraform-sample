@@ -60,7 +60,7 @@ pipeline {
             }
          }           
          steps {
-            sh "terraform apply -input=false tfplan"
+            terraformApply()
          }
       }
       stage('Output') {
@@ -70,7 +70,7 @@ pipeline {
             }
          }           
          steps {
-            sh "terraform output --json > Terraform_Output.json"
+            terraformOutput()
          }
       }             
       stage('Destroy') {
@@ -78,8 +78,7 @@ pipeline {
             equals expected: true, actual: params.destroy
          }        
          steps {
-            sh "terraform destroy --auto-approve"
-            sh "aws s3 rb s3://${bucketName} --force" 
+            terraformDestroy()
          }
       }
    }
